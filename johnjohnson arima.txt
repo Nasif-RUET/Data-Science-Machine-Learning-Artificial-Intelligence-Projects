@@ -1,0 +1,42 @@
+plot(JohnsonJohnson)
+acf(JohnsonJohnson)
+library(seastests)
+isSeasonal(JohnsonJohnson)
+summary(isSeasonal(JohnsonJohnson))
+fried(JohnsonJohnson)
+library(tseries)
+kpss.test(JohnsonJohnson)#p-value = 0.01, non-stationary
+adf.test(JohnsonJohnson)#p-value = 0.99, non-stationary
+library(forecast)
+BoxCox.lambda(JohnsonJohnson)##0.1540752
+newJJ=BoxCox(JohnsonJohnson, lambda =  BoxCox.lambda(JohnsonJohnson))
+plot(newJJ)
+kpss.test(newJJ)#p-value = 0.01, non-stationary
+adf.test(newJJ)#p-value = 0.4188, non-stationary
+isSeasonal(newJJ)
+#DnewJJ=diff(newJJ, differences = 1) #Non-seasonal diff
+SDnewJJ=diff(newJJ, lag=4) #Seasonal diff
+kpss.test(SDnewJJ)#p-value = 0.09395, Stationary
+adf.test(SDnewJJ)#p-value = 0.09934, non-stationary
+SDnewJJ_2=diff(SDnewJJ, differences = 1)
+kpss.test(SDnewJJ_2)
+adf.test(SDnewJJ_2)#p-value = 0.01, stationary
+par(mfrow=c(1,2))
+acf(SDnewJJ_2)
+pacf(SDnewJJ_2)
+##ARIMA(p=pacf=1,4, q=acf=1,7)
+fit1=Arima(newJJ, order=c(1,1,1), seasonal=c(0,1,0))
+fit2=Arima(newJJ, order=c(4,1,1), seasonal=c(0,1,0))
+fit3=Arima(newJJ, order=c(1,1,7), seasonal=c(0,1,0))
+fit4=Arima(newJJ, order=c(4,1,7), seasonal=c(0,1,0))
+summary(fit2)
+summary(fit3)
+summary(fit4)
+ndiffs(JohnsonJohnson)
+ff=forecast(fit2, h=15)$mean
+BTnewJJ=(0.1540752*ff+1)^(1/0.1540752)
+BTnewJJ
+plot(forecast(fit2, h=15))
+e1=HoltWinters(JohnsonJohnson, seasonal = 'multiplicative')
+forecast(e1, h=15)
+AIC(e1)
