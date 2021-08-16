@@ -1,0 +1,66 @@
+###### To get the BOSTON data from sklear datasets and then make
+#### that as a DATAFRAME with pandas####
+from sklearn import datasets
+boston= datasets.load_boston ()
+import pandas as pd
+df_boston = pd.DataFrame(boston.data ,columns = boston.feature_names)
+df_boston['price']=boston.target
+
+###To run a simple linear regression model with price is 
+### the dependent variable and LSTAT is an independent variable
+import statsmodels.formula.api as smf
+results = smf.ols('price ~ LSTAT', data= df_boston).fit()
+print(results.summary())
+
+###To run the miltiple regresssion model with all independent variables
+import statsmodels.formula.api as smf
+model3=smf.ols('price ~ INDUS+RM+AGE+PTRATIO+LSTAT', data= df_boston).fit()
+print(model3.summary())
+
+####### To run the multiple linear regression model with LinearRegression from sklearn
+from sklearn import datasets
+boston= datasets.load_boston ()
+
+from sklearn.linear_model import LinearRegression
+x=boston.data
+y=boston.target
+model = LinearRegression().fit(x, y)
+print('intercept:', model.intercept_)
+print('slope:', model.coef_)
+r_sq = model.score(x, y)
+print('coefficient of determination:', r_sq)
+############################################################################
+import numpy as np
+import pandas as pd
+
+
+#########Logistic Regression with statsmodels ###########################
+import pandas as pd
+import statsmodels.api as sm
+
+df=pd.read_csv('haberman.csv', sep=',')
+cols=['age', 'operation_year', 'axil_nodes']
+x=df[cols]
+
+##### sm.Logit needs a dependent variable with range (0, 1), but y=status has 1 and 2.
+##### So y=status is taking the new values 0=1 and 1=2
+df['status']=df['status'].map({1:0, 2:1})
+y=df['status']
+logitmodel=sm.Logit(y,x)
+result=logitmodel.fit()
+print(result.summary2() )
+
+############Logistic Regression with sklearn ###########################
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+
+df = pd.read_csv('haberman.csv')
+cols = ['age','operation_year','axil_nodes']
+x = df[cols]
+y = df['status']
+logmodel = LogisticRegression()
+logmodel.fit(x, y)
+print('Coefficients:', logmodel.coef_)
+print('Intercept:', logmodel.intercept_)
+
+
